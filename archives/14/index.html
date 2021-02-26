@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-hozen.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-hozen.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-hozen.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="概述   在复杂的 web 开发中，我们应采用 DOM 2 级事件来绑定和移除函数。即使用 addEventListener 和 removeEventListener 方法为 DOM 节点绑定和解绑函数。因为 DOM 1 级事件不支持多个函数的绑定。这意味着，当你使用 DOM 1 级为 DOM 绑定新函数时，旧的函数会被取代。这在很多情况下是不被希望看到的。   例如，我们经常会在 do">
+<meta name="keywords" content="DOM2级事件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为DOM2级事件函数传参——bind的应用">
+<meta property="og:url" content="http://github.com/hooozen/archives/14/index.html">
+<meta property="og:site_name" content="李浩然的博客">
+<meta property="og:description" content="概述   在复杂的 web 开发中，我们应采用 DOM 2 级事件来绑定和移除函数。即使用 addEventListener 和 removeEventListener 方法为 DOM 节点绑定和解绑函数。因为 DOM 1 级事件不支持多个函数的绑定。这意味着，当你使用 DOM 1 级为 DOM 绑定新函数时，旧的函数会被取代。这在很多情况下是不被希望看到的。   例如，我们经常会在 do">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-26T10:25:45.482Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为DOM2级事件函数传参——bind的应用">
+<meta name="twitter:description" content="概述   在复杂的 web 开发中，我们应采用 DOM 2 级事件来绑定和移除函数。即使用 addEventListener 和 removeEventListener 方法为 DOM 节点绑定和解绑函数。因为 DOM 1 级事件不支持多个函数的绑定。这意味着，当你使用 DOM 1 级为 DOM 绑定新函数时，旧的函数会被取代。这在很多情况下是不被希望看到的。   例如，我们经常会在 do">
+
+
+
+
+
+
+  <link rel="canonical" href="http://github.com/hooozen/archives/14/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  
+  <title>为DOM2级事件函数传参——bind的应用 | 李浩然的博客</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?592bceed8dae935c03e5966e00621b72";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">李浩然的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">予尝求古仁人之心</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-friends">
+    <a href="/friends/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>友链</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://github.com/hooozen/archives/14/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李浩然">
+      <meta itemprop="description" content="身无长物，唯守赤心">
+      <meta itemprop="image" content="/images/hozen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李浩然的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">为DOM2级事件函数传参——bind的应用
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-04-07 10:55:44" itemprop="dateCreated datePublished" datetime="2018-04-07T10:55:44+08:00">2018-04-07</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2021-02-26 18:25:45" itemprop="dateModified" datetime="2021-02-26T18:25:45+08:00">2021-02-26</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ClientScript/" itemprop="url" rel="index"><span itemprop="name">ClientScript</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <a id="more"></a>
+<h2 id="概述">概述</h2>
+<p>  在复杂的 web 开发中，我们应采用 DOM 2 级事件来绑定和移除函数。即使用 <code>addEventListener</code> 和 <code>removeEventListener</code> 方法为 DOM 节点绑定和解绑函数。因为 DOM 1 级事件不支持多个函数的绑定。这意味着，当你使用 DOM 1 级为 DOM 绑定新函数时，旧的函数会被取代。这在很多情况下是不被希望看到的。</p>
+<p>  例如，我们经常会在 <code>document</code> 对象上绑定多个鼠标事件，使用 DOM 2 级事件既不会取消之前的函数，也不用担心对项目组其他成员编写的事件绑定造成影响。</p>
+<h2 id="一个问题">一个问题</h2>
+<p>  一个常见的 DOM 2 级事件绑定和解绑如下： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fn = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'in function'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 绑定</span></span><br><span class="line">element.addEventListener(<span class="string">'cilck'</span>, fn);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解绑</span></span><br><span class="line">element.removeEventListener(<span class="string">'click'</span>, fn);</span><br></pre></td></tr></table></figure></p>
+<p>  如上，由于一个 DOM 2 级事件可以被绑定多个函数，所以当我们解绑函数时，需指明要解绑的函数名。这意味着，如果在 DOM 2 级事件上绑定了一个匿名函数，那么是难以解绑改函数的。所以应尽量避免绑定匿名函数。</p>
+<p>  但通常，绑定的函数并不是完全孤立的，我们需要传入一些参数。新手常会犯的一个错误就是企图通过以下语句传参： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">element.addEventListener(<span class="string">'click'</span>, fn(params));</span><br></pre></td></tr></table></figure></p>
+<p>  然而，上面的写法会直接执行 <code>fn</code> 函数，而不是等待点击事件的触发时才执行。给 <code>click</code> 绑定的也是 <code>fn(params)</code> 的返回值，而非 <code>fn</code> 函数。</p>
+<h2 id="实例">实例</h2>
+<p>  下面是一个例子。该实例实现点击小球时可以拖拽小球，当松开鼠标时停止拖拽。考虑到要在 <code>document</code> 上绑定事件，我们使用 DOM 2 级事件。 <iframe height="265" scrolling="no" title="bind" src="//codepen.io/Hozen/embed/yKRxRO/?height=265&theme-id=0&default-tab=result&embed-version=2" frameborder="no" allowtransparency="true" allowfullscreen="true" style="width: 100%;">See the Pen <a href="https://codepen.io/Hozen/pen/yKRxRO/" target="_blank" rel="noopener">bind</a> by Hozen (<a href="https://codepen.io/Hozen" target="_blank" rel="noopener"><span class="citation" data-cites="Hozen">@Hozen</span></a>) on <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a>. </iframe></p>
+<p>  通常，实现拖拽效果时，大体思路是： * 点击目标对象时，为 <code>document</code> 绑定 <code>mousemove</code> 事件，当鼠标移动时，根据鼠标位置设置目标对象的位置。</p>
+<ul>
+<li>当鼠标弹起时，解绑 <code>document</code> 的 <code>mousemove</code> 事件。</li>
+</ul>
+<p>  这样需要监听目标对象的 <code>mousedown</code> 事件， <code>document</code> 的 <code>mousemove</code> 和 <code>mouseup</code> 事件。</p>
+<p>  当鼠标在目标对象上按下时，我们需要计算出此时目标对象的位置，然后将位置信息作为参数，传入 <code>mousemove</code> 事件函数中。这就涉及了 DOM 2 级事件的传参问题。</p>
+<p>  该例中的实现代码如下： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 主函数</span></span><br><span class="line"><span class="keyword">const</span> main = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> ball = <span class="built_in">document</span>.getElementById(<span class="string">'ball'</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">let</span> isDraging = <span class="literal">false</span>; <span class="comment">// 记录是否在拖动中</span></span><br><span class="line">  </span><br><span class="line">  <span class="keyword">let</span> dragWithParams; <span class="comment">// 绑定参数的拖动方法</span></span><br><span class="line">  </span><br><span class="line">  <span class="keyword">const</span> drag = <span class="function">(<span class="params">params, e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> x = e.clientX - params.offsetLeft;</span><br><span class="line">    <span class="keyword">let</span> y = e.clientY - params.offsetTop;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 避免小球移出视口</span></span><br><span class="line">    <span class="keyword">if</span> (x &lt; <span class="number">0</span>) &#123;</span><br><span class="line">      x = <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (x &gt; <span class="built_in">document</span>.documentElement.clientWidth - ball.offsetWidth) &#123;</span><br><span class="line">      x = <span class="built_in">document</span>.documentElement.clientWidth - ball.offsetWidth</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (y &lt; <span class="number">0</span>) &#123;</span><br><span class="line">      y = <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (y &gt; <span class="built_in">document</span>.documentElement.clientHeight - ball.offsetHeight) &#123;</span><br><span class="line">      y = <span class="built_in">document</span>.documentElement.clientHeight - ball.offsetHeight;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ball.style.left = x + <span class="string">'px'</span>;</span><br><span class="line">    ball.style.top = y + <span class="string">'px'</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 当鼠标弹起时判断是否移除 mousemove 事件</span></span><br><span class="line">  <span class="built_in">document</span>.addEventListener(<span class="string">'mouseup'</span>, () =&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (isDraging) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'up'</span>);</span><br><span class="line">      <span class="built_in">document</span>.removeEventListener(<span class="string">'mousemove'</span>, dragWithParams);</span><br><span class="line">      isDraging = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 点击球时为 document 绑定 mousemove 事件</span></span><br><span class="line">  ball.addEventListener(<span class="string">'mousedown'</span>, e =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> offsetLeft = e.clientX - ball.offsetLeft;</span><br><span class="line">    <span class="keyword">const</span> offsetTop = e.clientY - ball.offsetTop;</span><br><span class="line">    </span><br><span class="line">    isDraging = <span class="literal">true</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 绑定参数</span></span><br><span class="line">    dragWithParams = drag.bind(<span class="literal">null</span>, &#123;</span><br><span class="line">      offsetLeft,</span><br><span class="line">      offsetTop,</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">'mousemove'</span>, dragWithParams);</span><br><span class="line">   &#125;);</span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">'DOMContentLoaded'</span>, main);</span><br></pre></td></tr></table></figure></p>
+<h3 id="代码分析">代码分析</h3>
+<p>  上例中利用了 <code>bind</code> 方法可以绑定参数的特点来为事件函数绑定参数。<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="noopener">点击查看 <code>bind</code> 详情</a>。</p>
+<p>  同样需要注意的是，代码中为绑定参数后的 <code>drag</code> 函数赋予了新的引用 <code>dragWithParams</code>。这是因为 <code>bind</code> 方法返回的是原函数的拷贝而非原函数。所以，如果我们不赋予它引用名，该函数就变成了匿名函数，我们依然无法解绑。例如，下面的例子中，是无法解绑的。 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fn = <span class="function">(<span class="params">params</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(params);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> params = <span class="string">'some params'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处相当于绑定了一个匿名函数</span></span><br><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">'mousemove'</span>, fn.bind(<span class="literal">null</span>, params));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 无法解绑事件，因为该事件绑定的不是 fn 函数，而是它的一个拷贝。</span></span><br><span class="line"><span class="built_in">document</span>.remvoeEventListener(<span class="string">'mousemove'</span>, fn);</span><br></pre></td></tr></table></figure></p>
+<p>  <code>bind</code> 方法第一个参数指定函数中 <code>this</code> 的指向，其余的参数会被作为绑定的参数传入新的函数，并且会出现在传入参数的前面位置。所以在示例代码 <code>drag</code> 函数中，将 event 对象参数放在了 <code>params</code> 后面接收。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/DOM2级事件/" rel="tag"># DOM2级事件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/13/" rel="next" title="我与明二">
+                <i class="fa fa-chevron-left"></i> 我与明二
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/15/" rel="prev" title="requestAnimationFrame——HTML5动画利器">
+                requestAnimationFrame——HTML5动画利器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+  
+
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hozen.jpg" alt="李浩然">
+            
+              <p class="site-author-name" itemprop="name">李浩然</p>
+              <p class="site-description motion-element" itemprop="description">身无长物，唯守赤心</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">28</span>
+                    <span class="site-state-item-name">博客</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/hooozen" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:hozen@live.com" target="_blank" title="E-Mail" rel="external nofollow"><i class="fa fa-fw fa-envelope"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://codepen.io/Hozen/" target="_blank" title="CodePen" rel="external nofollow"><i class="fa fa-fw fa-codepen"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/Accenzer" target="_blank" title="微博" rel="external nofollow"><i class="fa fa-fw fa-weibo"></i></a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友链
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://oathkeeper.hozen.site" title="OathKeeper" target="_blank">OathKeeper</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.zhangck.com/" title="上午茶" target="_blank">上午茶</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://chenwenke.cn/blog/" title="陈文科的博客" target="_blank">陈文科的博客</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://yangtiancoder.github.io" title="YangTian" target="_blank">YangTian</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.bugwz.com/" title="咕咕" target="_blank">咕咕</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个问题"><span class="nav-number">2.</span> <span class="nav-text">一个问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例"><span class="nav-number">3.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#代码分析"><span class="nav-number">3.1.</span> <span class="nav-text">代码分析</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="author" itemprop="copyrightHolder">www.hozen.site</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Power By <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" rel="external nofollow" href="https://theme-next.org">NexT.Muse</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: '2dd3e808150d02b6810b',
+      clientSecret: '35312c390f46acf9b1ac500f0f99f508b8c7ffd1',
+      repo: 'hooozen.github.io',
+      owner: 'hooozen',
+      admin: 'hooozen',
+      id: window.location.pathname,
+      language: 'zh-CN', 
+    });
+    gitalk.render('gitalk-container');
+  </script>
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
