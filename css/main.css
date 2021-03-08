@@ -1334,7 +1334,7 @@ pre .javascript .function {
   margin: 0 auto 25px;
 }
 .posts-expand .post-body img {
-  margin: 0 auto 25px;
+  margin: 0 auto 10px;
 }
 @media (max-width: 767px) {
   .posts-collapse {
@@ -1845,7 +1845,7 @@ img:hover {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #4becff;
+  background: #29f4bb;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -2617,4 +2617,8 @@ embed {
 }
 .links-of-blogroll-inline .links-of-blogroll-item {
   display: inline-block;
+}
+figcaption {
+  font-size: 13px;
+  text-align: center;
 }
