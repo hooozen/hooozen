@@ -1,4 +1,12 @@
-### Hi there 👋
+<img align="right" src="https://github-readme-stats.vercel.app/api?username=hooozen&show_icons=true&icon_color=7e9680&text_color=718096&bg_color=00000000&hide_title=false&hide_border=true" />
+
+### 你好，世界 👋
+
+- ✍️ [www.hozen.sitie](https://hozen.site)
+- 🎓 Bachelor of Software Engineering & Master of Statistics 
+- 🔍 Focusing on Front-end
+- 🛠️ Develepment & Data science
+
 
 <!--
 **hooozen/hooozen** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
