@@ -1,6 +1,6 @@
 <img align="right" src="https://github-readme-stats.vercel.app/api?username=hooozen&show_icons=true&icon_color=7e9680&text_color=718096&bg_color=00000000&hide_title=true&hide_border=true" />
 
-#### 你好 👋
+### 你好 👋
 
 - ✍️ [www.hozen.sitie](https://hozen.site)
 - 🎓 Software Engineering & Statistics 
